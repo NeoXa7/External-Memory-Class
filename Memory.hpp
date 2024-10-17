@@ -23,13 +23,13 @@ public:
 		type value = {};
 		SIZE_T bytesRead;
 		if (!ReadProcessMemory(ProcessHandle, (LPCVOID)(address), &value, sizeof(type), &bytesRead)) {
-			//cerr << "Could not read memory at address " << hex << address << ". Error: " << GetLastError() << endl;
+			cerr << "Could not read memory at address " << hex << address << ". Error: " << GetLastError() << endl;
 			return value;
 		}
 
 		if (bytesRead != sizeof(type)) {
-			//cerr << "Unexpected number of bytes read. Expected: " << sizeof(type) << ", Actual: " << bytesRead << endl;
-			return value;  // Return the default value instead of false
+			cerr << "Unexpected number of bytes read. Expected: " << sizeof(type) << ", Actual: " << bytesRead << endl;
+			return value;
 		}
 
 		return value;
@@ -39,12 +39,12 @@ public:
 	inline bool WriteMemory(uintptr_t address, const type& value) {
 		SIZE_T bytesWritten;
 		if (!WriteProcessMemory(ProcessHandle, (LPVOID)(address), &value, sizeof(type), &bytesWritten)) {
-			//cerr << "Could not write memory at address " << hex << address << ". Error: " << GetLastError() << endl;
+			cerr << "Could not write memory at address " << hex << address << ". Error: " << GetLastError() << endl;
 			return false;
 		}
 
 		if (bytesWritten != sizeof(type)) {
-			//cerr << "Unexpected number of bytes written. Expected: " << sizeof(type) << ", Actual: " << bytesWritten << endl;
+			cerr << "Unexpected number of bytes written. Expected: " << sizeof(type) << ", Actual: " << bytesWritten << endl;
 			return false;
 		}
 	}
@@ -53,7 +53,7 @@ public:
 	inline bool ReadArray(uintptr_t address, type* buffer, size_t size) {
 		SIZE_T bytesRead;
 		if (!ReadProcessMemory(ProcessHandle, (LPCVOID)(address), buffer, size, &bytesRead)) {
-			//cerr << "Could not read array at address " << hex << address << ". Error: " << GetLastError() << endl;
+			cerr << "Could not read array at address " << hex << address << ". Error: " << GetLastError() << endl;
 			return false;
 		}
 		return bytesRead == size;
@@ -64,8 +64,8 @@ public:
 		uintptr_t addr = initialAddress;
 		for (unsigned int i = 0; i < offsets.size(); ++i) {
 			if (!ReadProcessMemory(ProcessHandle, (BYTE*)addr, &addr, sizeof(addr), 0)) {
-				//   cerr << "Failed to read memory at address " << hex << addr << ". Error: " << GetLastError() << dec << endl;
-				return 0; // Return 0 on failure
+				   cerr << "Failed to read memory at address " << hex << addr << ". Error: " << GetLastError() << dec << endl;
+				return 0;
 			}
 			addr += offsets[i];
 		}
@@ -82,14 +82,14 @@ public:
 
 		DWORD offset_null = 0;
 		ReadProcessMemory(ProcessHandle, (LPVOID*)(gameBaseAddr + address), &offset_null, sizeof(offset_null), 0);
-		DWORD pointeraddress = offset_null; // the address we need
+		DWORD pointeraddress = offset_null;
 
 		for (size_t i = 0; i < offsets.size() - 1; i++) {
 			ReadProcessMemory(ProcessHandle, (LPVOID*)(pointeraddress + offsets.at(i)), &pointeraddress, sizeof(pointeraddress), 0);
 		}
 
-		CloseHandle(ProcessHandle); // Close process handle when done
-		return pointeraddress + offsets.at(offsets.size() - 1); // adding the last offset
+		CloseHandle(ProcessHandle);
+		return pointeraddress + offsets.at(offsets.size() - 1); 
 	}
 
 	template <typename type>
