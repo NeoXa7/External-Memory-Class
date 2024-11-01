@@ -1,5 +1,15 @@
 #pragma once
-#include <Globals/Includes.hpp>
+#include <windows.h>
+#include <tlhelp32.h>
+#include <iostream>
+#include <string>
+#include <algorithm>
+#include <tchar.h>
+#include <vector>
+#include <thread> 
+#include <chrono> 
+#include <process.h>
+#include <fstream>
 
 #define WIN32_LEAN_AND_MEAN
 
